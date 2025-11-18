@@ -110,7 +110,24 @@ class FederatedClient:
         num_epochs = num_epochs or self.config.training.num_epochs
         
         print(f"\n[Client {self.client_id}] Starting training for {num_epochs} epochs...")
-        print(f"[Client {self.client_id}] Dataset size: {len(self.dataset)}")
+
+        # Prepare dataset: shuffle and optionally subsample to speed up training
+        dataset = self.dataset
+        try:
+            if getattr(self.config.training, "shuffle_dataset", True):
+                dataset = dataset.shuffle(seed=self.config.seed)
+        except Exception as e:
+            print(f"[Client {self.client_id}] Warning: failed to shuffle dataset: {e}")
+
+        max_samples = getattr(self.config.training, "max_samples_per_client", None)
+        if max_samples is not None and len(dataset) > max_samples:
+            try:
+                dataset = dataset.select(list(range(int(max_samples))))
+                print(f"[Client {self.client_id}] Subsampled dataset to {len(dataset)} samples for faster training")
+            except Exception as e:
+                print(f"[Client {self.client_id}] Warning: failed to subsample dataset: {e}")
+
+        print(f"[Client {self.client_id}] Dataset size: {len(dataset)}")
         
         # Create output directory for this client
         output_dir = os.path.join(
@@ -149,7 +166,7 @@ class FederatedClient:
         trainer = Trainer(
             model=self.model,
             args=training_args,
-            train_dataset=self.dataset,
+            train_dataset=dataset,
             data_collator=data_collator,
         )
         

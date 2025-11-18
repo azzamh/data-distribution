@@ -39,6 +39,9 @@ class TrainingConfig:
     save_steps: int = 500
     eval_steps: int = 100
     fp16: bool = False  # Mixed precision training
+    # Shuffle and subsample to speed up local training
+    shuffle_dataset: bool = True
+    max_samples_per_client: Optional[int] = None  # If set, limit samples per client for faster runs
 
 
 @dataclass
