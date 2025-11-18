@@ -1,0 +1,11 @@
+datasets
+transformers
+torch
+pandas
+numpy
+scikit-learn
+kagglehub
+peft
+accelerate
+matplotlib
+tqdm

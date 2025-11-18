@@ -1,0 +1,54 @@
+{
+  "experiment_name": "federated_gpt2_lora",
+  "output_dir": "./fed_results",
+  "log_dir": "./fed_logs",
+  "seed": 42,
+  "device": "cuda",
+  "model": {
+    "model_name": "gpt2",
+    "max_length": 128,
+    "cache_dir": null
+  },
+  "lora": {
+    "r": 8,
+    "lora_alpha": 16,
+    "target_modules": [
+      "c_attn",
+      "c_proj"
+    ],
+    "lora_dropout": 0.1,
+    "bias": "none",
+    "task_type": "CAUSAL_LM"
+  },
+  "training": {
+    "num_epochs": 2,
+    "batch_size": 4,
+    "learning_rate": 5e-05,
+    "weight_decay": 0.01,
+    "warmup_steps": 100,
+    "gradient_accumulation_steps": 1,
+    "max_grad_norm": 1.0,
+    "logging_steps": 10,
+    "save_steps": 500,
+    "eval_steps": 100,
+    "fp16": false
+  },
+  "federated": {
+    "num_clients": 5,
+    "num_rounds": 5,
+    "clients_per_round": 3,
+    "data_distribution": "by_author",
+    "aggregation_method": "fedavg",
+    "min_samples_per_client": 100
+  },
+  "data": {
+    "dataset_path": "./twcs/twcs.csv",
+    "text_column": "text",
+    "author_column": "author_id",
+    "train_split": 0.8,
+    "val_split": 0.1,
+    "test_split": 0.1,
+    "filter_min_length": 10,
+    "filter_inbound_only": true
+  }
+}
